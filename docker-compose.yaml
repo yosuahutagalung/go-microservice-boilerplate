@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  # --- COCKROACHDB ---
+  # Single-node insecure cluster for local development
+  cockroachdb:
+    image: cockroachdb/cockroach:latest-v23.1
+    command: start-single-node --insecure
+    ports:
+      - "26257:26257" # The Postgres-compatible SQL port
+      - "8080:8080"   # CockroachDB Admin Web UI
+    volumes:
+      - roach_data:/cockroach/cockroach-data
+
+  # --- NSQ MESSAGE QUEUE ---
+  # 1. Topology Discovery
+  nsqlookupd:
+    image: nsqio/nsq:latest
+    command: /nsqlookupd
+    ports:
+      - "4160:4160" # TCP (for nsqd to register itself)
+      - "4161:4161" # HTTP (for clients to discover nsqd nodes)
+
+  # 2. The Actual Message Broker
+  nsqd:
+    image: nsqio/nsq:latest
+    # Broadcast to 127.0.0.1 so your Go app running on your host machine can reach it
+    command: /nsqd --lookupd-tcp-address=nsqlookupd:4160 --broadcast-address=nsqd
+    depends_on:
+      - nsqlookupd
+    ports:
+      - "4150:4150" # TCP (for your Go Publisher)
+      - "4151:4151" # HTTP
+
+  # 3. Web UI for Monitoring Topics and Channels
+  nsqadmin:
+    image: nsqio/nsq:latest
+    command: /nsqadmin --lookupd-http-address=nsqlookupd:4161
+    depends_on:
+      - nsqlookupd
+    ports:
+      - "4171:4171" # Admin Web UI
+
+volumes:
+  roach_data:

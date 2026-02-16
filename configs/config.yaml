@@ -1,0 +1,22 @@
+server:
+  http:
+    addr: 0.0.0.0:8000
+    timeout: 1s
+  grpc:
+    addr: 0.0.0.0:9000
+    timeout: 1s
+data:
+  database:
+    driver: postgres
+    source: "${DATABASE_SOURCE}"
+  # redis:
+  #   addr: 127.0.0.1:6379
+  #   read_timeout: 0.2s
+  #   write_timeout: 0.2s
+  mq:
+    nsqd_addr: "${NSQD_ADDR}"
+    lookupd_addr: "${LOOKUPD_ADDR}"
+    topics:
+      greeting_events:
+        topic: "greeting_topic"
+        channel: "greeter_worker"
