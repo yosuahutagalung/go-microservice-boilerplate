@@ -5,19 +5,12 @@
 package db
 
 import (
-	"database/sql"
 	"time"
 
 	"github.com/google/uuid"
 )
 
-type Greeter struct {
-	ID        string       `json:"id"`
-	Hello     string       `json:"hello"`
-	CreatedAt sql.NullTime `json:"created_at"`
-}
-
-type OutboxEvent struct {
+type ServiceBoilerplateOutboxEvent struct {
 	ID        uuid.UUID `json:"id"`
 	Topic     string    `json:"topic"`
 	Payload   []byte    `json:"payload"`

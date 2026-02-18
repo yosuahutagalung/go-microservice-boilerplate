@@ -23,9 +23,6 @@ func NewNSQServer(c *conf.Data, svc *service.GreeterService) (*NSQServer, error)
 
 	nsqConfig := nsq.NewConfig()
 
-	// ==========================================
-	// 1. Setup Greeting Events Consumer
-	// ==========================================
 	if info, exists := c.Mq.Topics["greeting_events"]; exists {
 		consumer, err := nsq.NewConsumer(info.Topic, info.Channel, nsqConfig)
 		if err != nil {
@@ -38,18 +35,8 @@ func NewNSQServer(c *conf.Data, svc *service.GreeterService) (*NSQServer, error)
 		// Add to our list of managed consumers
 		srv.consumers = append(srv.consumers, consumer)
 	} else {
-		// Just a helpful warning in case someone forgot to add it to config.yaml
 		fmt.Println("⚠️ WARNING: 'greeting_events' missing from config.yaml topics map")
 	}
-
-	// ==========================================
-	// 2. Add Future Consumers Here (e.g., Loan Approval, Audit)
-	// ==========================================
-	/*
-		if info, exists := c.Mq.Topics["loan_events"]; exists {
-			// Initialize loan consumer, attach svc.HandleLoanEvent, append to srv.consumers
-		}
-	*/
 
 	return srv, nil
 }

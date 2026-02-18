@@ -2,11 +2,9 @@ package data
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"service_boilerplate/internal/biz"
 	"service_boilerplate/internal/conf"
-	"service_boilerplate/internal/data/db"
 
 	"github.com/nsqio/go-nsq"
 )
@@ -31,10 +29,12 @@ func NewNSQPublisher(c *conf.Data, data *Data, producer *nsq.Producer) (biz.Gree
 }
 
 func (p *nsqPublisher) PublishGreetingSaid(ctx context.Context, g *biz.Greeter) error {
-	payload, _ := json.Marshal(g)
+	// payload, _ := json.Marshal(g)
 
-	return p.data.query.InsertOutboxEvent(ctx, db.InsertOutboxEventParams{
-		Topic:   p.greetingTopic,
-		Payload: payload,
-	})
+	// return p.data.query.InsertOutboxEvent(ctx, db.InsertOutboxEventParams{
+	// 	Topic:   p.greetingTopic,
+	// 	Payload: payload,
+	// })
+
+	return nil
 }

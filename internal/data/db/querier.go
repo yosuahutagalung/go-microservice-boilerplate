@@ -11,11 +11,8 @@ import (
 )
 
 type Querier interface {
-	CreateGreeter(ctx context.Context, arg CreateGreeterParams) (Greeter, error)
-	GetGreeter(ctx context.Context, id string) (Greeter, error)
 	GetPendingOutboxEvents(ctx context.Context, limit int32) ([]GetPendingOutboxEventsRow, error)
 	InsertOutboxEvent(ctx context.Context, arg InsertOutboxEventParams) error
-	ListGreeter(ctx context.Context) ([]Greeter, error)
 	MarkOutboxEventPublished(ctx context.Context, id uuid.UUID) error
 }
 

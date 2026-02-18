@@ -13,7 +13,7 @@ import (
 
 const getPendingOutboxEvents = `-- name: GetPendingOutboxEvents :many
 SELECT id, topic, payload
-FROM outbox_events
+FROM service_boilerplate_outbox_events
 WHERE status = 'PENDING'
 ORDER BY created_at ASC
 LIMIT $1
@@ -50,7 +50,7 @@ func (q *Queries) GetPendingOutboxEvents(ctx context.Context, limit int32) ([]Ge
 }
 
 const insertOutboxEvent = `-- name: InsertOutboxEvent :exec
-INSERT INTO outbox_events (topic, payload, status)
+INSERT INTO service_boilerplate_outbox_events (topic, payload, status)
 VALUES ($1, $2, 'PENDING')
 `
 
@@ -65,7 +65,7 @@ func (q *Queries) InsertOutboxEvent(ctx context.Context, arg InsertOutboxEventPa
 }
 
 const markOutboxEventPublished = `-- name: MarkOutboxEventPublished :exec
-UPDATE outbox_events 
+UPDATE service_boilerplate_outbox_events 
 SET status = 'PUBLISHED' 
 WHERE id = $1
 `
