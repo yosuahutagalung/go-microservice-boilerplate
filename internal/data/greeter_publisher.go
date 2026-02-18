@@ -10,20 +10,20 @@ import (
 	"github.com/nsqio/go-nsq"
 )
 
-type nsqPublisher struct {
+type greeterPublisher struct {
 	data          *Data
 	producer      *nsq.Producer
 	greetingTopic string
 	log           *log.Helper
 }
 
-func NewNSQPublisher(c *conf.Data, data *Data, producer *nsq.Producer, logger log.Logger) (biz.GreeterEventPublisher, error) {
+func NewGreeterPublisher(c *conf.Data, data *Data, producer *nsq.Producer, logger log.Logger) (biz.GreeterEventPublisher, error) {
 	topicInfo, ok := c.Mq.Topics["greeting_events"]
 	if !ok {
 		return nil, fmt.Errorf("missing NSQ topic configuration for 'greeting_events'")
 	}
 
-	return &nsqPublisher{
+	return &greeterPublisher{
 		data:          data,
 		producer:      producer,
 		greetingTopic: topicInfo.Topic,
@@ -31,7 +31,7 @@ func NewNSQPublisher(c *conf.Data, data *Data, producer *nsq.Producer, logger lo
 	}, nil
 }
 
-func (p *nsqPublisher) PublishGreetingSaid(ctx context.Context, g *biz.Greeter) error {
+func (p *greeterPublisher) PublishGreetingSaid(ctx context.Context, g *biz.Greeter) error {
 	// payload, _ := json.Marshal(g)
 
 	// return p.data.query.InsertOutboxEvent(ctx, db.InsertOutboxEventParams{

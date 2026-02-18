@@ -34,7 +34,7 @@ func wireApp(confServer *conf.Server, confData *conf.Data, logger log.Logger) (*
 		cleanup()
 		return nil, nil, err
 	}
-	greeterEventPublisher, err := data.NewNSQPublisher(confData, dataData, producer, logger)
+	greeterEventPublisher, err := data.NewGreeterPublisher(confData, dataData, producer, logger)
 	if err != nil {
 		cleanup2()
 		cleanup()
