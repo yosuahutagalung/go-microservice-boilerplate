@@ -11,27 +11,27 @@ import (
 )
 
 type greeterPublisher struct {
-	data          *Data
-	producer      *nsq.Producer
-	greetingTopic string
-	log           *log.Helper
+	data     *Data
+	producer *nsq.Producer
+	topics   map[string]*conf.Data_MQ_TopicInfo
+	log      *log.Helper
 }
 
 func NewGreeterPublisher(c *conf.Data, data *Data, producer *nsq.Producer, logger log.Logger) (biz.GreeterEventPublisher, error) {
-	topicInfo, ok := c.Mq.Topics["greeting_events"]
-	if !ok {
-		return nil, fmt.Errorf("missing NSQ topic configuration for 'greeting_events'")
-	}
-
 	return &greeterPublisher{
-		data:          data,
-		producer:      producer,
-		greetingTopic: topicInfo.Topic,
-		log:           log.NewHelper(logger),
+		data:     data,
+		producer: producer,
+		topics:   c.Mq.Topics,
+		log:      log.NewHelper(logger),
 	}, nil
 }
 
 func (p *greeterPublisher) PublishGreetingSaid(ctx context.Context, g *biz.Greeter) error {
+	_, exists := p.topics["greeting_events"]
+	if !exists {
+		return fmt.Errorf("missing NSQ topic configuration for 'greeting_events'")
+	}
+
 	// payload, _ := json.Marshal(g)
 
 	// return p.data.query.InsertOutboxEvent(ctx, db.InsertOutboxEventParams{
