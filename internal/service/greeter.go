@@ -7,6 +7,7 @@ import (
 	v1 "service_boilerplate/api/helloworld/v1"
 	"service_boilerplate/internal/biz"
 
+	"github.com/go-kratos/kratos/v2/log"
 	"github.com/nsqio/go-nsq"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
@@ -15,12 +16,16 @@ import (
 type GreeterService struct {
 	v1.UnimplementedGreeterServer
 
-	uc *biz.GreeterUsecase
+	uc  *biz.GreeterUsecase
+	log *log.Helper
 }
 
 // NewGreeterService new a greeter service.
-func NewGreeterService(uc *biz.GreeterUsecase) *GreeterService {
-	return &GreeterService{uc: uc}
+func NewGreeterService(uc *biz.GreeterUsecase, logger log.Logger) *GreeterService {
+	return &GreeterService{
+		uc:  uc,
+		log: log.NewHelper(logger),
+	}
 }
 
 // SayHello implements helloworld.GreeterServer.

@@ -2,11 +2,11 @@ package server
 
 import (
 	"context"
-	"fmt"
 
 	"service_boilerplate/internal/conf"
 	"service_boilerplate/internal/service"
 
+	"github.com/go-kratos/kratos/v2/log"
 	"github.com/nsqio/go-nsq"
 )
 
@@ -14,11 +14,13 @@ import (
 type NSQServer struct {
 	consumers []*nsq.Consumer
 	lookupd   string
+	log       *log.Helper
 }
 
-func NewNSQServer(c *conf.Data, svc *service.GreeterService) (*NSQServer, error) {
+func NewNSQServer(c *conf.Data, svc *service.GreeterService, logger log.Logger) (*NSQServer, error) {
 	srv := &NSQServer{
 		lookupd: c.Mq.LookupdAddr,
+		log:     log.NewHelper(logger),
 	}
 
 	nsqConfig := nsq.NewConfig()
@@ -35,7 +37,7 @@ func NewNSQServer(c *conf.Data, svc *service.GreeterService) (*NSQServer, error)
 		// Add to our list of managed consumers
 		srv.consumers = append(srv.consumers, consumer)
 	} else {
-		fmt.Println("⚠️ WARNING: 'greeting_events' missing from config.yaml topics map")
+		srv.log.Warn("⚠️ WARNING: 'greeting_events' missing from config.yaml topics map")
 	}
 
 	return srv, nil
@@ -49,7 +51,7 @@ func (s *NSQServer) Start(ctx context.Context) error {
 			return err
 		}
 	}
-	fmt.Printf("🚀 NSQ Server started, listening to %d channels\n", len(s.consumers))
+	s.log.Infof("🚀 NSQ Server started, listening to %d channels", len(s.consumers))
 	return nil
 }
 
@@ -64,6 +66,6 @@ func (s *NSQServer) Stop(ctx context.Context) error {
 	for _, consumer := range s.consumers {
 		<-consumer.StopChan
 	}
-	fmt.Println("🛑 NSQ Server gracefully stopped")
+	s.log.Info("🛑 NSQ Server gracefully stopped")
 	return nil
 }

@@ -34,17 +34,17 @@ func wireApp(confServer *conf.Server, confData *conf.Data, logger log.Logger) (*
 		cleanup()
 		return nil, nil, err
 	}
-	greeterEventPublisher, err := data.NewNSQPublisher(confData, dataData, producer)
+	greeterEventPublisher, err := data.NewNSQPublisher(confData, dataData, producer, logger)
 	if err != nil {
 		cleanup2()
 		cleanup()
 		return nil, nil, err
 	}
 	greeterUsecase := biz.NewGreeterUsecase(greeterRepo, greeterEventPublisher, logger)
-	greeterService := service.NewGreeterService(greeterUsecase)
+	greeterService := service.NewGreeterService(greeterUsecase, logger)
 	grpcServer := server.NewGRPCServer(confServer, greeterService, logger)
 	httpServer := server.NewHTTPServer(confServer, greeterService, logger)
-	nsqServer, err := server.NewNSQServer(confData, greeterService)
+	nsqServer, err := server.NewNSQServer(confData, greeterService, logger)
 	if err != nil {
 		cleanup2()
 		cleanup()

@@ -2,7 +2,6 @@ package server
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"service_boilerplate/internal/biz"
@@ -105,7 +104,7 @@ func (s *OutboxRelayServer) processPendingEvents() {
 			// It will be re-sent next loop. (Downstream consumers must be idempotent!)
 			s.log.Errorf("failed to mark event %s as published: %v", event.ID, err)
 		} else {
-			fmt.Printf("✅ Relayed outbox event: %s\n", event.ID)
+			s.log.Infof("✅ Relayed outbox event: %s", event.ID)
 		}
 	}
 }

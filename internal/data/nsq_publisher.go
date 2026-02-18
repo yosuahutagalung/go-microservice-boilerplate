@@ -6,6 +6,7 @@ import (
 	"service_boilerplate/internal/biz"
 	"service_boilerplate/internal/conf"
 
+	"github.com/go-kratos/kratos/v2/log"
 	"github.com/nsqio/go-nsq"
 )
 
@@ -13,9 +14,10 @@ type nsqPublisher struct {
 	data          *Data
 	producer      *nsq.Producer
 	greetingTopic string
+	log           *log.Helper
 }
 
-func NewNSQPublisher(c *conf.Data, data *Data, producer *nsq.Producer) (biz.GreeterEventPublisher, error) {
+func NewNSQPublisher(c *conf.Data, data *Data, producer *nsq.Producer, logger log.Logger) (biz.GreeterEventPublisher, error) {
 	topicInfo, ok := c.Mq.Topics["greeting_events"]
 	if !ok {
 		return nil, fmt.Errorf("missing NSQ topic configuration for 'greeting_events'")
@@ -25,6 +27,7 @@ func NewNSQPublisher(c *conf.Data, data *Data, producer *nsq.Producer) (biz.Gree
 		data:          data,
 		producer:      producer,
 		greetingTopic: topicInfo.Topic,
+		log:           log.NewHelper(logger),
 	}, nil
 }
 
