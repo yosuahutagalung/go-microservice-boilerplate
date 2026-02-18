@@ -12,10 +12,9 @@ import (
 
 type OutboxRelayServer struct {
 	repo     biz.OutboxRepo
-	producer *nsq.Producer // We inject the NSQ Producer directly here
+	producer *nsq.Producer
 	log      *log.Helper
 
-	// Context controls the background loop lifecycle
 	ctx    context.Context
 	cancel context.CancelFunc
 }
@@ -73,7 +72,6 @@ func (s *OutboxRelayServer) runLoop() {
 }
 
 func (s *OutboxRelayServer) processPendingEvents() {
-	// 1. Fetch up to 100 pending events (Using SKIP LOCKED so multiple workers don't collide)
 	events, err := s.repo.GetPendingEvents(s.ctx, 100)
 	if err != nil {
 		s.log.Errorf("failed to fetch outbox events: %v", err)
@@ -84,7 +82,6 @@ func (s *OutboxRelayServer) processPendingEvents() {
 		return // Nothing to do
 	}
 
-	// 2. Loop through and publish each one
 	for _, event := range events {
 		if s.producer == nil {
 			s.log.Errorf("❌ ERROR: Producer is nil when trying to publish event %s", event.ID)
@@ -97,7 +94,7 @@ func (s *OutboxRelayServer) processPendingEvents() {
 			continue // If NSQ is down, skip this event. We will try again in 1 second.
 		}
 
-		// 3. Mark as published in the database
+		// Mark as published in the database
 		err = s.repo.MarkPublished(s.ctx, event.ID)
 		if err != nil {
 			// Edge case: Message sent to NSQ, but DB update failed.

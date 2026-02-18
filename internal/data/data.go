@@ -20,26 +20,21 @@ type Data struct {
 	query *db.Queries
 }
 
-// NewData establishes the actual connections
 func NewData(c *conf.Data, logger log.Logger) (*Data, func(), error) {
 	log := log.NewHelper(logger)
 
-	// 1. Open the PostgreSQL/CockroachDB connection
 	sqlDB, err := sql.Open(c.Database.Driver, c.Database.Source)
 	if err != nil {
 		log.Errorf("failed opening connection to postgres: %v", err)
 		return nil, nil, err
 	}
 
-	// 2. Test the connection
 	if err := sqlDB.Ping(); err != nil {
 		return nil, nil, err
 	}
 
-	// 3. Initialize SQLC
 	queries := db.New(sqlDB)
 
-	// 4. Create the cleanup function for graceful shutdown
 	cleanup := func() {
 		log.Info("closing the data resources")
 		if err := sqlDB.Close(); err != nil {

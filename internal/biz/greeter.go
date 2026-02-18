@@ -30,7 +30,7 @@ type GreeterRepo interface {
 
 type GreeterUsecase struct {
 	repo GreeterRepo
-	pub  GreeterEventPublisher // Inject the publisher
+	pub  GreeterEventPublisher
 	log  *log.Helper
 }
 
