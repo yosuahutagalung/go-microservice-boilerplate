@@ -4,8 +4,9 @@ import (
 	"context"
 	"encoding/json"
 
-	v1 "service_boilerplate/api/helloworld/v1"
 	"service_boilerplate/internal/biz"
+
+	v1 "github.com/yosuahutagalung/go-microservice-boilerplate-schema-registry/proto/helloworld/v1"
 
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/nsqio/go-nsq"
